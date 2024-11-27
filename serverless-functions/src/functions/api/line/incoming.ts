@@ -13,9 +13,8 @@ import * as Helper from "./line.helper.private";
 const { LINEMessageType } = <typeof LINETypes>(
   require(Runtime.getFunctions()["api/line/line_types"].path)
 );
-const { wrappedSendToFlex, lineValidateSignature } = <typeof Helper>(
-  require(Runtime.getFunctions()["api/line/line.helper"].path)
-);
+const { wrappedSendToFlex, lineValidateSignature, wrappedSendToLineResolver } =
+  <typeof Helper>require(Runtime.getFunctions()["api/line/line.helper"].path);
 export const handler: ServerlessFunctionSignature<
   LINETypes.LINEContext,
   any
@@ -49,6 +48,26 @@ export const handler: ServerlessFunctionSignature<
     // Step 2: Process Twilio Conversations
     // -- Handle Multiple Events Recieved in Webhook
     for (const msg of event.events) {
+      if (
+        msg.type === "postback" ||
+        !!(msg.type === "message" && msg.message.text === "LINEで質問")
+      ) {
+        await wrappedSendToLineResolver(context, msg.source.userId, msg);
+        if (!(msg.type === "postback" && msg.postback.data === "22")) {
+          return callback(null, {
+            success: true,
+          });
+        } else {
+          // オペレーターと繋ぐ
+          await wrappedSendToFlex(context, msg.source.userId, {
+            type: "text",
+            text: "いいえ、オペレーターとチャットで相談",
+          });
+          return callback(null, {
+            success: true,
+          });
+        }
+      }
       // -- Process Each Event
       if (msg.source.userId && msg.message) {
         const userId = msg.source.userId;

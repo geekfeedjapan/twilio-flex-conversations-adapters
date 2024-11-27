@@ -31,6 +31,115 @@ const {
   require(Runtime.getFunctions()["api/common/common.helper"].path)
 );
 
+export const wrappedSendToLineResolver = async (context, userId, msg) => {
+  const resolvers = resolver[msg.type];
+  if (resolvers) {
+    const createMessages =
+      resolvers[msg.type === "message" ? msg.message.text : msg.postback.data];
+    const clientConfig: ClientConfig = {
+      channelAccessToken: context.LINE_CHANNEL_ACCESS_TOKEN,
+      channelSecret: context.LINE_CHANNEL_SECRET,
+    };
+    const lineClient = new Client(clientConfig);
+    // line api でメッセージを送信
+    for (const message of createMessages) {
+      !!message &&
+        (await lineClient.pushMessage({
+          to: userId,
+          messages: [message],
+        }));
+    }
+  } else {
+    throw new Error("No resolver found");
+  }
+};
+
+const resolver = {
+  message: {
+    LINEで質問: [
+      {
+        type: "template",
+        altText: "よくあるお問い合わせ",
+        template: {
+          type: "buttons",
+          title: "よくあるお問い合わせ",
+          text: "本日はどのようなご相談でしょうか",
+          actions: [
+            {
+              type: "postback",
+              label: "キャンペーンについて",
+              data: "11",
+              displayText: "キャンペーンについて",
+            },
+            {
+              type: "postback",
+              label: "サービスについて",
+              data: "12",
+              displayText: "サービスについて",
+            },
+            {
+              type: "postback",
+              label: "紛失・盗難",
+              data: "13",
+              displayText: "紛失・盗難",
+            },
+          ],
+        },
+      },
+    ],
+  },
+  postback: {
+    11: [
+      {
+        type: "template",
+        altText: "キャンペーンについて",
+        template: {
+          type: "buttons",
+          title: "キャンペーンについて",
+          text: "現在実施中のキャンペーンは下記URLをご覧ください",
+          actions: [
+            {
+              type: "uri",
+              label: "キャンペーンページ",
+              uri: "https://www.google.com",
+            },
+          ],
+        },
+      },
+      {
+        type: "template",
+        altText: "解決されましたでしょうか",
+        template: {
+          type: "buttons",
+          title: "解決確認",
+          text: "解決されましたでしょうか",
+          actions: [
+            {
+              type: "postback",
+              label: "はい、メニューに戻る",
+              data: "21",
+              displayText: "はい、メニューに戻る",
+            },
+            {
+              type: "postback",
+              label: "いいえ、オペレーターとチャットで相談",
+              data: "22",
+              displayText: "いいえ、オペレーターとチャットで相談",
+            },
+          ],
+        },
+      },
+    ],
+    21: [],
+    22: [
+      {
+        type: "text",
+        text: "オペレターとお繋ぎします。\n今しばらくお待ちください",
+      },
+    ],
+  },
+};
+
 export const wrappedSendToFlex = async (
   context: Context<LINETypes.LINEContext>,
   userId: string,
@@ -39,7 +148,13 @@ export const wrappedSendToFlex = async (
   const client = context.getTwilioClient();
 
   // Step 1: Check for any existing conversation. If doesn't exist, create a new conversation -> add participant -> add webhooks
-  const identity = `line:${userId}`;
+  const clientConfig: ClientConfig = {
+    channelAccessToken: context.LINE_CHANNEL_ACCESS_TOKEN,
+    channelSecret: context.LINE_CHANNEL_SECRET,
+  };
+  const lineClient = new Client(clientConfig);
+  const userProfile = await lineClient.getProfile(userId);
+  const identity = `line: ${userProfile.displayName}`;
   console.log(identity);
 
   let { conversationSid, chatServiceSid } =
