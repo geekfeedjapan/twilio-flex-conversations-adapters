@@ -44,7 +44,7 @@ export const wrappedSendToLineResolver = async (
       resolvers[
         msg.type === "message"
           ? (msg as MessageEvent).message.type === "text"
-            ? (msg as MessageEvent).message.text
+            ? ((msg as MessageEvent).message as TextMessage).text
             : ""
           : (msg as PostbackEvent).postback.data
       ];
