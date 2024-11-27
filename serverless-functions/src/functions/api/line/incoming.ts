@@ -8,6 +8,7 @@ import {
 } from "@twilio-labs/serverless-runtime-types/types";
 import * as LINETypes from "./line_types.private";
 import * as Helper from "./line.helper.private";
+import { EventMessage } from "@line/bot-sdk";
 
 // Load Libraries
 const { LINEMessageType } = <typeof LINETypes>(
@@ -60,9 +61,9 @@ export const handler: ServerlessFunctionSignature<
         } else {
           // オペレーターと繋ぐ
           await wrappedSendToFlex(context, msg.source.userId, {
-            type: "text",
+            type: LINEMessageType.TEXT,
             text: "いいえ、オペレーターとチャットで相談",
-          });
+          } as EventMessage);
           return callback(null, {
             success: true,
           });
