@@ -9,6 +9,8 @@ import {
   ImageMessage,
   VideoMessage,
   EventMessage,
+  PostbackEvent,
+  MessageEvent,
 } from "@line/bot-sdk";
 import * as Util from "../common/common.helper.private";
 import * as LINETypes from "./line_types.private";
@@ -31,8 +33,12 @@ const {
   require(Runtime.getFunctions()["api/common/common.helper"].path)
 );
 
-export const wrappedSendToLineResolver = async (context, userId, msg) => {
-  const resolvers = resolver[msg.type];
+export const wrappedSendToLineResolver = async (
+  context: Context<LINETypes.LINEContext>,
+  userId: string,
+  msg: MessageEvent | PostbackEvent
+) => {
+  const resolvers = resolver[msg.type as keyof ResolverType];
   if (resolvers) {
     const createMessages =
       resolvers[msg.type === "message" ? msg.message.text : msg.postback.data];
@@ -54,7 +60,12 @@ export const wrappedSendToLineResolver = async (context, userId, msg) => {
   }
 };
 
-const resolver = {
+type ResolverType = {
+  message: { [key: string]: any[] };
+  postback: { [key: string]: any[] };
+};
+
+const resolver: ResolverType = {
   message: {
     LINEで質問: [
       {
