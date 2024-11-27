@@ -41,19 +41,23 @@ export const wrappedSendToLineResolver = async (
   const resolvers = resolver[msg.type as keyof ResolverType];
   if (resolvers) {
     const createMessages =
-      resolvers[msg.type === "message" ? msg.message.text : msg.postback.data];
+      resolvers[
+        msg.type === "message"
+          ? (msg as MessageEvent).message.type === "text"
+            ? (msg as MessageEvent).message.text
+            : ""
+          : (msg as PostbackEvent).postback.data
+      ];
     const clientConfig: ClientConfig = {
       channelAccessToken: context.LINE_CHANNEL_ACCESS_TOKEN,
       channelSecret: context.LINE_CHANNEL_SECRET,
     };
     const lineClient = new Client(clientConfig);
-    // line api でメッセージを送信
+    // LINE APIでメッセージを送信
     for (const message of createMessages) {
-      !!message &&
-        (await lineClient.pushMessage({
-          to: userId,
-          messages: [message],
-        }));
+      if (message) {
+        await lineClient.pushMessage(userId, message);
+      }
     }
   } else {
     throw new Error("No resolver found");
