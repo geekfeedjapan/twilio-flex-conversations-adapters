@@ -20,8 +20,8 @@ export enum LINEMessageType {
 }
 
 export type CustomContext = {
-  CAMPAIGN_URL: string;
-  SERVICE_URL: string;
+  CAMPAIGN_URL?: string;
+  SERVICE_URL?: string;
 };
 
 export type LINEContext = DefaultLINEContext & CustomContext;
