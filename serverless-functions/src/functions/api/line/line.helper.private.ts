@@ -47,7 +47,7 @@ export const wrappedSendToLineResolver = async (
             ? ((msg as MessageEvent).message as TextMessage).text
             : ""
           : (msg as PostbackEvent).postback.data
-      ];
+      ](context);
     const clientConfig: ClientConfig = {
       channelAccessToken: context.LINE_CHANNEL_ACCESS_TOKEN,
       channelSecret: context.LINE_CHANNEL_SECRET,
@@ -65,13 +65,13 @@ export const wrappedSendToLineResolver = async (
 };
 
 type ResolverType = {
-  message: { [key: string]: any[] };
-  postback: { [key: string]: any[] };
+  message: { [key: string]: (context: Context) => any[] };
+  postback: { [key: string]: (context: Context) => any[] };
 };
 
 const resolver: ResolverType = {
   message: {
-    LINEで質問: [
+    LINEで質問: (context: Context) => [
       {
         type: "template",
         altText: "よくあるお問い合わせ",
@@ -104,19 +104,50 @@ const resolver: ResolverType = {
     ],
   },
   postback: {
-    11: [
+    "00": (context: Context) => [
+      {
+        type: "template",
+        altText: "よくあるお問い合わせ",
+        template: {
+          type: "buttons",
+          title: "よくあるお問い合わせ",
+          text: "本日はどのようなご相談でしょうか",
+          actions: [
+            {
+              type: "postback",
+              label: "キャンペーンについて",
+              data: "11",
+              displayText: "キャンペーンについて",
+            },
+            {
+              type: "postback",
+              label: "サービスについて",
+              data: "12",
+              displayText: "サービスについて",
+            },
+            {
+              type: "postback",
+              label: "紛失・盗難",
+              data: "13",
+              displayText: "紛失・盗難",
+            },
+          ],
+        },
+      },
+    ],
+    11: (context: Context) => [
       {
         type: "template",
         altText: "キャンペーンについて",
         template: {
           type: "buttons",
           title: "キャンペーンについて",
-          text: "現在実施中のキャンペーンは下記URLをご覧ください",
+          text: "現在実施中のキャンペーンは下記ページをご覧ください",
           actions: [
             {
               type: "uri",
               label: "キャンペーンページ",
-              uri: process.env.CAMPAIGN_URL,
+              uri: context.CAMPAIGN_URL,
             },
           ],
         },
@@ -131,22 +162,90 @@ const resolver: ResolverType = {
           actions: [
             {
               type: "postback",
-              label: "はい、メニューに戻る",
-              data: "21",
-              displayText: "はい、メニューに戻る",
+              label: "はい、よくあるお問い合わせに戻る",
+              data: "00",
+              displayText: "はい",
             },
             {
               type: "postback",
               label: "いいえ、オペレーターとチャットで相談",
-              data: "22",
+              data: "99",
               displayText: "いいえ、オペレーターとチャットで相談",
             },
           ],
         },
       },
     ],
-    21: [],
-    22: [],
+    12: (context: Context) => [
+      {
+        type: "template",
+        altText: "サービスについて",
+        template: {
+          type: "buttons",
+          title: "サービスについて",
+          text: "サービス内容について詳しく知りたい場合は下記ページをご覧ください",
+          actions: [
+            {
+              type: "uri",
+              label: "サービスページ",
+              uri: context.SERVICE_URL,
+            },
+          ],
+        },
+      },
+      {
+        type: "template",
+        altText: "解決されましたでしょうか",
+        template: {
+          type: "buttons",
+          title: "解決確認",
+          text: "解決されましたでしょうか",
+          actions: [
+            {
+              type: "postback",
+              label: "はい、よくあるに戻る",
+              data: "00",
+              displayText: "はい、よくあるお問い合わせに戻る",
+            },
+            {
+              type: "postback",
+              label: "いいえ、オペレーターとチャットで相談",
+              data: "99",
+              displayText: "いいえ、オペレーターとチャットで相談",
+            },
+          ],
+        },
+      },
+    ],
+    13: (context: Context) => [
+      {
+        type: "text",
+        text: "カードを紛失・盗難にあわれた場合、すぐに弊社の紛失・盗難専用窓口までご連絡ください。カードの停止手続きを行い、必要に応じて再発行の手続きをいたします。",
+      },
+      {
+        type: "template",
+        altText: "オペレーターに連絡しますか？",
+        template: {
+          type: "buttons",
+          title: "連絡確認",
+          text: "オペレーターに連絡しますか？",
+          actions: [
+            {
+              type: "postback",
+              label: "はい、オペレーターに連絡",
+              data: "98",
+              displayText: "はい、オペレーターに連絡",
+            },
+            {
+              type: "postback",
+              label: "いいえ、よくあるお問い合わせに戻る",
+              data: "00",
+              displayText: "いいえ、よくあるお問い合わせに戻る",
+            },
+          ],
+        },
+      },
+    ],
   },
 };
 

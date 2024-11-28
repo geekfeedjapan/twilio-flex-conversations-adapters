@@ -54,7 +54,12 @@ export const handler: ServerlessFunctionSignature<
         !!(msg.type === "message" && msg.message.text === "LINEで質問")
       ) {
         await wrappedSendToLineResolver(context, msg.source.userId, msg);
-        if (!(msg.type === "postback" && msg.postback.data === "22")) {
+        if (
+          !(
+            msg.type === "postback" &&
+            (msg.postback.data === "99" || msg.postback.data === "98")
+          )
+        ) {
           return callback(null, {
             success: true,
           });
@@ -62,7 +67,10 @@ export const handler: ServerlessFunctionSignature<
           // オペレーターと繋ぐ
           await wrappedSendToFlex(context, msg.source.userId, {
             type: LINEMessageType.TEXT,
-            text: "いいえ、オペレーターとチャットで相談",
+            text:
+              msg.postback.data === "98"
+                ? "紛失・盗難のお問い合わせ"
+                : "いいえ、オペレーターとチャットで相談",
           } as EventMessage);
           return callback(null, {
             success: true,
