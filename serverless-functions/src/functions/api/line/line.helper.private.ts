@@ -70,13 +70,21 @@ export const wrappedSendToLineResolver = async (
 };
 
 type ResolverType = {
-  message: { [key: string]: (context: Context<CustomContext>) => any[] };
-  postback: { [key: string]: (context: Context<CustomContext>) => any[] };
+  message: {
+    [key: string]: (
+      context: Context<LINETypes.LINEContext & CustomContext>
+    ) => any[];
+  };
+  postback: {
+    [key: string]: (
+      context: Context<LINETypes.LINEContext & CustomContext>
+    ) => any[];
+  };
 };
 
 const resolver: ResolverType = {
   message: {
-    LINEで質問: (context: Context<CustomContext>) => [
+    LINEで質問: (context: Context<LINETypes.LINEContext & CustomContext>) => [
       {
         type: "template",
         altText: "よくあるお問い合わせ",
@@ -109,7 +117,7 @@ const resolver: ResolverType = {
     ],
   },
   postback: {
-    "00": (context: Context<CustomContext>) => [
+    "00": (context: Context<LINETypes.LINEContext & CustomContext>) => [
       {
         type: "template",
         altText: "よくあるお問い合わせ",
@@ -140,7 +148,7 @@ const resolver: ResolverType = {
         },
       },
     ],
-    11: (context: Context<CustomContext>) => [
+    11: (context: Context<LINETypes.LINEContext & CustomContext>) => [
       {
         type: "template",
         altText: "キャンペーンについて",
@@ -181,7 +189,7 @@ const resolver: ResolverType = {
         },
       },
     ],
-    12: (context: Context<CustomContext>) => [
+    12: (context: Context<LINETypes.LINEContext & CustomContext>) => [
       {
         type: "template",
         altText: "サービスについて",
@@ -222,7 +230,7 @@ const resolver: ResolverType = {
         },
       },
     ],
-    13: (context: Context<CustomContext>) => [
+    13: (context: Context<LINETypes.LINEContext & CustomContext>) => [
       {
         type: "text",
         text: "カードを紛失・盗難にあわれた場合、すぐに弊社の紛失・盗難専用窓口までご連絡ください。カードの停止手続きを行い、必要に応じて再発行の手続きをいたします。",
