@@ -1,7 +1,7 @@
 // Import Libraries
 import crypto from "crypto";
 import fetch, { Response } from "node-fetch";
-import { Context } from "@twilio-labs/serverless-runtime-types/types";
+import { Context as DefaultContext } from "@twilio-labs/serverless-runtime-types/types";
 import {
   ClientConfig,
   Client,
@@ -14,6 +14,13 @@ import {
 } from "@line/bot-sdk";
 import * as Util from "../common/common.helper.private";
 import * as LINETypes from "./line_types.private";
+
+type CustomContext = {
+  CAMPAIGN_URL: string;
+  SERVICE_URL: string;
+};
+
+type Context = DefaultContext & CustomContext;
 
 // Load TypeScript - Types
 const { LINEMessageType } = <typeof LINETypes>(
