@@ -15,11 +15,6 @@ import {
 import * as Util from "../common/common.helper.private";
 import * as LINETypes from "./line_types.private";
 
-type CustomContext = {
-  CAMPAIGN_URL: string;
-  SERVICE_URL: string;
-};
-
 // Load TypeScript - Types
 const { LINEMessageType } = <typeof LINETypes>(
   require(Runtime.getFunctions()["api/line/line_types"].path)
@@ -39,7 +34,7 @@ const {
 );
 
 export const wrappedSendToLineResolver = async (
-  context: Context<LINETypes.LINEContext & CustomContext>,
+  context: Context<LINETypes.LINEContext>,
   userId: string,
   msg: MessageEvent | PostbackEvent
 ) => {
@@ -71,20 +66,16 @@ export const wrappedSendToLineResolver = async (
 
 type ResolverType = {
   message: {
-    [key: string]: (
-      context: Context<LINETypes.LINEContext & CustomContext>
-    ) => any[];
+    [key: string]: (context: Context<LINETypes.LINEContext>) => any[];
   };
   postback: {
-    [key: string]: (
-      context: Context<LINETypes.LINEContext & CustomContext>
-    ) => any[];
+    [key: string]: (context: Context<LINETypes.LINEContext>) => any[];
   };
 };
 
 const resolver: ResolverType = {
   message: {
-    LINEで質問: (context: Context<LINETypes.LINEContext & CustomContext>) => [
+    LINEで質問: (context: Context<LINETypes.LINEContext>) => [
       {
         type: "template",
         altText: "よくあるお問い合わせ",
@@ -117,7 +108,7 @@ const resolver: ResolverType = {
     ],
   },
   postback: {
-    "00": (context: Context<LINETypes.LINEContext & CustomContext>) => [
+    "00": (context: Context<LINETypes.LINEContext>) => [
       {
         type: "template",
         altText: "よくあるお問い合わせ",
@@ -148,7 +139,7 @@ const resolver: ResolverType = {
         },
       },
     ],
-    11: (context: Context<LINETypes.LINEContext & CustomContext>) => [
+    11: (context: Context<LINETypes.LINEContext>) => [
       {
         type: "template",
         altText: "キャンペーンについて",
@@ -189,7 +180,7 @@ const resolver: ResolverType = {
         },
       },
     ],
-    12: (context: Context<LINETypes.LINEContext & CustomContext>) => [
+    12: (context: Context<LINETypes.LINEContext>) => [
       {
         type: "template",
         altText: "サービスについて",
@@ -230,7 +221,7 @@ const resolver: ResolverType = {
         },
       },
     ],
-    13: (context: Context<LINETypes.LINEContext & CustomContext>) => [
+    13: (context: Context<LINETypes.LINEContext>) => [
       {
         type: "text",
         text: "カードを紛失・盗難にあわれた場合、すぐに弊社の紛失・盗難専用窓口までご連絡ください。カードの停止手続きを行い、必要に応じて再発行の手続きをいたします。",
