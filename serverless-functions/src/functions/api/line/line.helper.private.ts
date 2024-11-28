@@ -1,7 +1,7 @@
 // Import Libraries
 import crypto from "crypto";
 import fetch, { Response } from "node-fetch";
-import { Context as DefaultContext } from "@twilio-labs/serverless-runtime-types/types";
+import { Context } from "@twilio-labs/serverless-runtime-types/types";
 import {
   ClientConfig,
   Client,
@@ -19,8 +19,6 @@ type CustomContext = {
   CAMPAIGN_URL: string;
   SERVICE_URL: string;
 };
-
-type Context = DefaultContext & CustomContext;
 
 // Load TypeScript - Types
 const { LINEMessageType } = <typeof LINETypes>(
@@ -41,7 +39,7 @@ const {
 );
 
 export const wrappedSendToLineResolver = async (
-  context: Context<LINETypes.LINEContext>,
+  context: Context<LINETypes.LINEContext & CustomContext>,
   userId: string,
   msg: MessageEvent | PostbackEvent
 ) => {
@@ -72,13 +70,13 @@ export const wrappedSendToLineResolver = async (
 };
 
 type ResolverType = {
-  message: { [key: string]: (context: Context) => any[] };
-  postback: { [key: string]: (context: Context) => any[] };
+  message: { [key: string]: (context: Context<CustomContext>) => any[] };
+  postback: { [key: string]: (context: Context<CustomContext>) => any[] };
 };
 
 const resolver: ResolverType = {
   message: {
-    LINEで質問: (context: Context) => [
+    LINEで質問: (context: Context<CustomContext>) => [
       {
         type: "template",
         altText: "よくあるお問い合わせ",
@@ -111,7 +109,7 @@ const resolver: ResolverType = {
     ],
   },
   postback: {
-    "00": (context: Context) => [
+    "00": (context: Context<CustomContext>) => [
       {
         type: "template",
         altText: "よくあるお問い合わせ",
@@ -142,7 +140,7 @@ const resolver: ResolverType = {
         },
       },
     ],
-    11: (context: Context) => [
+    11: (context: Context<CustomContext>) => [
       {
         type: "template",
         altText: "キャンペーンについて",
@@ -183,7 +181,7 @@ const resolver: ResolverType = {
         },
       },
     ],
-    12: (context: Context) => [
+    12: (context: Context<CustomContext>) => [
       {
         type: "template",
         altText: "サービスについて",
@@ -224,7 +222,7 @@ const resolver: ResolverType = {
         },
       },
     ],
-    13: (context: Context) => [
+    13: (context: Context<CustomContext>) => [
       {
         type: "text",
         text: "カードを紛失・盗難にあわれた場合、すぐに弊社の紛失・盗難専用窓口までご連絡ください。カードの停止手続きを行い、必要に応じて再発行の手続きをいたします。",
