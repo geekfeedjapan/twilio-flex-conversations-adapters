@@ -116,7 +116,7 @@ const resolver: ResolverType = {
             {
               type: "uri",
               label: "キャンペーンページ",
-              uri: "https://www.google.com",
+              uri: process.env.CAMPAIGN_URL,
             },
           ],
         },
