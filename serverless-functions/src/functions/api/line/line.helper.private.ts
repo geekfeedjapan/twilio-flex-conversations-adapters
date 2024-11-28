@@ -151,7 +151,7 @@ const resolver: ResolverType = {
             {
               type: "uri",
               label: "キャンペーンページ",
-              uri: context.CAMPAIGN_URL,
+              uri: "https://twilio.geekdev.tokyo/services/%e3%82%ad%e3%83%a3%e3%83%b3%e3%83%9a%e3%83%bc%e3%83%b3/",
             },
           ],
         },
@@ -192,7 +192,7 @@ const resolver: ResolverType = {
             {
               type: "uri",
               label: "サービスページ",
-              uri: context.SERVICE_URL,
+              uri: "https://twilio.geekdev.tokyo/",
             },
           ],
         },

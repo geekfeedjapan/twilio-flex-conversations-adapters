@@ -1,4 +1,4 @@
-export type DefaultLINEContext = {
+export type LINEContext = {
   LINE_STUDIO_FLOW_SID: string;
   LINE_CHANNEL_ID: string;
   LINE_CHANNEL_SECRET: string;
@@ -18,10 +18,3 @@ export enum LINEMessageType {
   VIDEO = "video",
   URL = "url",
 }
-
-export type CustomContext = {
-  CAMPAIGN_URL?: string;
-  SERVICE_URL?: string;
-};
-
-export type LINEContext = DefaultLINEContext & CustomContext;
