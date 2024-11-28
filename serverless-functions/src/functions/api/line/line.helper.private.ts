@@ -165,6 +165,11 @@ export const wrappedSendToFlex = async (
   const lineClient = new Client(clientConfig);
   const userProfile = await lineClient.getProfile(userId);
   const identity = `line: ${userProfile.displayName}`;
+  const attributes = {
+    type: "line",
+    userId: userId,
+    userName: userProfile.displayName,
+  };
   console.log(identity);
 
   let { conversationSid, chatServiceSid } =
@@ -184,7 +189,12 @@ export const wrappedSendToFlex = async (
     conversationSid = createConversationResult.conversationSid;
     chatServiceSid = createConversationResult.chatServiceSid;
     // -- Add Participant into Conversation
-    await twilioCreateParticipant(client, conversationSid, identity);
+    await twilioCreateParticipant(
+      client,
+      conversationSid,
+      identity,
+      attributes
+    );
     // -- Create Webhook (Conversation Scoped) for Studio
     await twilioCreateScopedWebhookStudio(
       client,
@@ -218,7 +228,9 @@ export const wrappedSendToFlex = async (
       client,
       conversationSid,
       identity,
-      (message as TextMessage).text
+      (message as TextMessage).text,
+      null,
+      attributes
     );
   } else if (
     message.type === LINEMessageType.IMAGE ||

@@ -77,7 +77,8 @@ export const twilioCreateMessage = async (
   conversationSid: string,
   author: string,
   body: string,
-  mediaSid: string | null = null
+  mediaSid: string | null = null,
+  attributes?: Object
 ) => {
   try {
     let result;
@@ -88,6 +89,7 @@ export const twilioCreateMessage = async (
           author: author,
           body: body,
           xTwilioWebhookEnabled: "true",
+          attributes: JSON.stringify(attributes),
         });
     } else {
       result = await client.conversations
@@ -97,6 +99,7 @@ export const twilioCreateMessage = async (
           body: body,
           mediaSid: mediaSid,
           xTwilioWebhookEnabled: "true",
+          attributes: JSON.stringify(attributes),
         });
     }
     if (result.sid) {
@@ -141,12 +144,16 @@ export const twilioDeleteMessage = async (
 export const twilioCreateParticipant = async (
   client: twilio.Twilio,
   conversationSid: string,
-  identity: string
+  identity: string,
+  attributes?: Object
 ) => {
   try {
     const result = await client.conversations
       .conversations(conversationSid)
-      .participants.create({ identity: identity });
+      .participants.create({
+        identity: identity,
+        attributes: JSON.stringify(attributes),
+      });
     if (result.sid) {
       return result.sid;
     } else {
