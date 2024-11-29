@@ -9,6 +9,7 @@ import {
 import * as LINETypes from "./line_types.private";
 import * as Helper from "./line.helper.private";
 import { EventMessage } from "@line/bot-sdk";
+import { SERVICE_URL, CAMPAIGN_URL } from "./config.private";
 
 // Load Libraries
 const { LINEMessageType } = <typeof LINETypes>(
@@ -47,24 +48,11 @@ export const handler: ServerlessFunctionSignature<
     }
 
     // Step 2: Process Twilio Conversations
-    // -- Handle Multiple Events Recieved in Webhook
     for (const msg of event.events) {
-      if (
-        msg.type === "postback" ||
-        !!(msg.type === "message" && msg.message.text === "LINEで質問")
-      ) {
-        await wrappedSendToLineResolver(context, msg.source.userId, msg);
-        if (
-          !(
-            msg.type === "postback" &&
-            (msg.postback.data === "99" || msg.postback.data === "98")
-          )
-        ) {
-          return callback(null, {
-            success: true,
-          });
-        } else {
-          // オペレーターと繋ぐ
+      // postbackとLINEで質問の処理を分離
+      if (msg.type === "postback") {
+        if (msg.postback.data === "98" || msg.postback.data === "99") {
+          // オペレーターと繋ぐ処理を直接実行
           await wrappedSendToFlex(context, msg.source.userId, {
             type: LINEMessageType.TEXT,
             text:
@@ -72,16 +60,21 @@ export const handler: ServerlessFunctionSignature<
                 ? "紛失・盗難のお問い合わせ"
                 : "いいえ、オペレーターとチャットで相談",
           } as EventMessage);
-          return callback(null, {
-            success: true,
-          });
+        } else {
+          // その他のpostbackの処理
+          await wrappedSendToLineResolver(context, msg.source.userId, msg);
         }
+        return callback(null, { success: true });
       }
-      // -- Process Each Event
+
+      if (msg.type === "message" && msg.message.text === "LINEで質問") {
+        await wrappedSendToLineResolver(context, msg.source.userId, msg);
+        return callback(null, { success: true });
+      }
+
+      // 通常のメッセージ処理
       if (msg.source.userId && msg.message) {
-        const userId = msg.source.userId;
-        const message = msg.message;
-        await wrappedSendToFlex(context, userId, message);
+        await wrappedSendToFlex(context, msg.source.userId, msg.message);
       }
     }
     return callback(null, {
