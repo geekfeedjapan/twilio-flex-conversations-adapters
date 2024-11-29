@@ -14,7 +14,7 @@ import {
 } from "@line/bot-sdk";
 import * as Util from "../common/common.helper.private";
 import * as LINETypes from "./line_types.private";
-
+import { SERVICE_URL, CAMPAIGN_URL } from "./config.private";
 // Load TypeScript - Types
 const { LINEMessageType } = <typeof LINETypes>(
   require(Runtime.getFunctions()["api/line/line_types"].path)
@@ -151,7 +151,7 @@ const resolver: ResolverType = {
             {
               type: "uri",
               label: "キャンペーンページ",
-              uri: "https://twilio.geekdev.tokyo/services/%e3%82%ad%e3%83%a3%e3%83%b3%e3%83%9a%e3%83%bc%e3%83%b3/",
+              uri: CAMPAIGN_URL,
             },
           ],
         },
@@ -192,7 +192,7 @@ const resolver: ResolverType = {
             {
               type: "uri",
               label: "サービスページ",
-              uri: "https://twilio.geekdev.tokyo/",
+              uri: SERVICE_URL,
             },
           ],
         },
