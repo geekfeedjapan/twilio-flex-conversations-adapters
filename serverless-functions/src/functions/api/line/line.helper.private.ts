@@ -33,6 +33,7 @@ const {
   twilioCreateScopedWebhookStudio,
   twilioCreateScopedWebhook,
   twilioCreateMessage,
+  twilioDeleteConversation,
 } = <typeof Util>(
   require(Runtime.getFunctions()["api/common/common.helper"].path)
 );
@@ -282,6 +283,9 @@ export const wrappedSendToFlex = async (
   let { conversationSid, chatServiceSid } =
     await twilioFindExistingConversation(client, identity);
 
+  if (conversationSid) {
+    return await twilioDeleteConversation(client, conversationSid);
+  }
   console.log(`Old Convo ID: ${conversationSid}`);
   console.log(`[Via Existing] Chat Service ID: ${chatServiceSid}`);
 
