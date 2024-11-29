@@ -51,6 +51,7 @@ export const handler: ServerlessFunctionSignature<
       // postbackとLINEで質問の処理を分離
       if (msg.type === "postback") {
         if (msg.postback.data === "98" || msg.postback.data === "99") {
+          console.log("postback data is 98 or 99");
           // オペレーターと繋ぐ処理を直接実行
           await wrappedSendToFlex(context, msg.source.userId, {
             type: LINEMessageType.TEXT,
