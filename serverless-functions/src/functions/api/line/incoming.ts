@@ -9,7 +9,6 @@ import {
 import * as LINETypes from "./line_types.private";
 import * as Helper from "./line.helper.private";
 import { EventMessage } from "@line/bot-sdk";
-import { SERVICE_URL, CAMPAIGN_URL } from "./config.private";
 
 // Load Libraries
 const { LINEMessageType } = <typeof LINETypes>(
