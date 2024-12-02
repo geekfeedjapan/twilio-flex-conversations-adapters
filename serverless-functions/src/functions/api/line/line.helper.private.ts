@@ -173,7 +173,7 @@ const resolver: ResolverType = {
               type: "postback",
               label: "はい、よくあるお問い合わせに戻る",
               data: "00",
-              displayText: "はい",
+              displayText: "はい、よくあるお問い合わせに戻る",
             },
             {
               type: "postback",
@@ -212,7 +212,7 @@ const resolver: ResolverType = {
           actions: [
             {
               type: "postback",
-              label: "はい、よくあるに戻る",
+              label: "はい、よくあるお問い合わせに戻る",
               data: "00",
               displayText: "はい、よくあるお問い合わせに戻る",
             },
@@ -243,7 +243,7 @@ const resolver: ResolverType = {
               type: "postback",
               label: "はい、オペレーターに連絡",
               data: "98",
-              displayText: "はい、オペレーターに連絡",
+              displayText: "紛失・盗難のお問い合わせ",
             },
             {
               type: "postback",
@@ -253,6 +253,18 @@ const resolver: ResolverType = {
             },
           ],
         },
+      },
+    ],
+    98: (context: Context<LINETypes.LINEContext>) => [
+      {
+        type: "text",
+        text: "オペレーターを呼び出しております。\n今しばらくお待ちください",
+      },
+    ],
+    99: (context: Context<LINETypes.LINEContext>) => [
+      {
+        type: "text",
+        text: "オペレーターを呼び出しております。\n今しばらくお待ちください",
       },
     ],
   },
