@@ -189,6 +189,19 @@ export const twilioCreateConversation = async (
     throw new Error("Could not create new conversation");
   }
 };
+/**
+ * Twilio - Delete Conversation
+ */
+export const twilioDeleteConversation = async (
+  client: twilio.Twilio,
+  conversationSid: string
+) => {
+  const result = await client.conversations.v1
+    .conversations(conversationSid)
+    .remove();
+  return result;
+};
+
 /*
  * Twilio - Find Existing Conversation
  */

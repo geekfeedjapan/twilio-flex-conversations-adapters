@@ -1,7 +1,4 @@
-// Imports global types
 import "@twilio-labs/serverless-runtime-types";
-
-// Fetches specific types
 import {
   ServerlessCallback,
   ServerlessFunctionSignature,
@@ -16,11 +13,13 @@ const { LINEMessageType } = <typeof LINETypes>(
 );
 const { wrappedSendToFlex, lineValidateSignature, wrappedSendToLineResolver } =
   <typeof Helper>require(Runtime.getFunctions()["api/line/line.helper"].path);
+
 export const handler: ServerlessFunctionSignature<
   LINETypes.LINEContext,
   any
 > = async (context, event, callback: ServerlessCallback) => {
   console.log("event received - /api/line/incoming: ", event);
+
   try {
     // Debug: Console Log Incoming Events
     console.log("---Start of Raw Event---");
@@ -29,8 +28,6 @@ export const handler: ServerlessFunctionSignature<
     console.log(event.destination);
     console.log(event.events);
     console.log("---End of Raw Event---");
-
-    // Step 1: Verify LINE signature
     const lineSignature = event.request.headers["x-line-signature"];
     const lineSignatureBody = JSON.stringify({
       destination: event.destination,
@@ -41,30 +38,13 @@ export const handler: ServerlessFunctionSignature<
       lineSignatureBody,
       context.LINE_CHANNEL_SECRET
     );
-    if (!validSignature) {
-      console.log("Invalid Signature");
-      return callback("Invalid Signature");
-    }
 
-    // Step 2: Process Twilio Conversations
-    // -- Handle Multiple Events Recieved in Webhook
+    if (!validSignature) return callback("Invalid Signature");
+
     for (const msg of event.events) {
-      if (
-        msg.type === "postback" ||
-        !!(msg.type === "message" && msg.message.text === "LINEで質問")
-      ) {
+      if (msg.type === "postback") {
         await wrappedSendToLineResolver(context, msg.source.userId, msg);
-        if (
-          !(
-            msg.type === "postback" &&
-            (msg.postback.data === "99" || msg.postback.data === "98")
-          )
-        ) {
-          return callback(null, {
-            success: true,
-          });
-        } else {
-          // オペレーターと繋ぐ
+        if (msg.postback.data === "98" || msg.postback.data === "99") {
           await wrappedSendToFlex(context, msg.source.userId, {
             type: LINEMessageType.TEXT,
             text:
@@ -72,23 +52,17 @@ export const handler: ServerlessFunctionSignature<
                 ? "紛失・盗難のお問い合わせ"
                 : "いいえ、オペレーターとチャットで相談",
           } as EventMessage);
-          return callback(null, {
-            success: true,
-          });
         }
-      }
-      // -- Process Each Event
-      if (msg.source.userId && msg.message) {
-        const userId = msg.source.userId;
-        const message = msg.message;
-        await wrappedSendToFlex(context, userId, message);
+      } else if (msg.type === "message" && msg.message.text === "LINEで質問") {
+        await wrappedSendToLineResolver(context, msg.source.userId, msg);
+      } else if (msg.source.userId && msg.message) {
+        await wrappedSendToFlex(context, msg.source.userId, msg.message);
       }
     }
-    return callback(null, {
-      success: true,
-    });
+
+    callback(null, { success: true });
   } catch (err) {
-    console.log(err);
-    return callback("outer catch error");
+    console.error(err);
+    callback("outer catch error");
   }
 };

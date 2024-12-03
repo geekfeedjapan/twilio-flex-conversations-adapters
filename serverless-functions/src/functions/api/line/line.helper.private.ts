@@ -15,6 +15,10 @@ import {
 import * as Util from "../common/common.helper.private";
 import * as LINETypes from "./line_types.private";
 
+export const SERVICE_URL = "https://twilio.geekdev.tokyo/";
+export const CAMPAIGN_URL =
+  "https://twilio.geekdev.tokyo/services/%e3%82%ad%e3%83%a3%e3%83%b3%e3%83%9a%e3%83%bc%e3%83%b3/";
+
 // Load TypeScript - Types
 const { LINEMessageType } = <typeof LINETypes>(
   require(Runtime.getFunctions()["api/line/line_types"].path)
@@ -29,6 +33,7 @@ const {
   twilioCreateScopedWebhookStudio,
   twilioCreateScopedWebhook,
   twilioCreateMessage,
+  // twilioDeleteConversation,
 } = <typeof Util>(
   require(Runtime.getFunctions()["api/common/common.helper"].path)
 );
@@ -151,7 +156,7 @@ const resolver: ResolverType = {
             {
               type: "uri",
               label: "キャンペーンページ",
-              uri: context.CAMPAIGN_URL,
+              uri: CAMPAIGN_URL,
             },
           ],
         },
@@ -168,7 +173,7 @@ const resolver: ResolverType = {
               type: "postback",
               label: "はい、よくあるお問い合わせに戻る",
               data: "00",
-              displayText: "はい",
+              displayText: "はい、よくあるお問い合わせに戻る",
             },
             {
               type: "postback",
@@ -192,7 +197,7 @@ const resolver: ResolverType = {
             {
               type: "uri",
               label: "サービスページ",
-              uri: context.SERVICE_URL,
+              uri: SERVICE_URL,
             },
           ],
         },
@@ -207,7 +212,7 @@ const resolver: ResolverType = {
           actions: [
             {
               type: "postback",
-              label: "はい、よくあるに戻る",
+              label: "はい、よくあるお問い合わせに戻る",
               data: "00",
               displayText: "はい、よくあるお問い合わせに戻る",
             },
@@ -238,7 +243,7 @@ const resolver: ResolverType = {
               type: "postback",
               label: "はい、オペレーターに連絡",
               data: "98",
-              displayText: "はい、オペレーターに連絡",
+              displayText: "紛失・盗難のお問い合わせ",
             },
             {
               type: "postback",
@@ -248,6 +253,18 @@ const resolver: ResolverType = {
             },
           ],
         },
+      },
+    ],
+    98: (context: Context<LINETypes.LINEContext>) => [
+      {
+        type: "text",
+        text: "オペレーターを呼び出しております。\n今しばらくお待ちください",
+      },
+    ],
+    99: (context: Context<LINETypes.LINEContext>) => [
+      {
+        type: "text",
+        text: "オペレーターを呼び出しております。\n今しばらくお待ちください",
       },
     ],
   },
