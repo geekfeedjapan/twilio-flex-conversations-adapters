@@ -15,9 +15,9 @@ import {
 import * as Util from "../common/common.helper.private";
 import * as LINETypes from "./line_types.private";
 
-export const SERVICE_URL = "https://twilio.geekdev.tokyo/";
+export const SERVICE_URL = "https://ebcdemo.geekdev.tokyo/";
 export const CAMPAIGN_URL =
-  "https://twilio.geekdev.tokyo/services/%e3%82%ad%e3%83%a3%e3%83%b3%e3%83%9a%e3%83%bc%e3%83%b3/";
+  "https://ebcdemo.geekdev.tokyo/services/%e3%82%ad%e3%83%a3%e3%83%b3%e3%83%9a%e3%83%bc%e3%83%b3/";
 
 // Load TypeScript - Types
 const { LINEMessageType } = <typeof LINETypes>(
